@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<meta http-equiv="X-UA-Compatible" content="ie=edge" />
+		<title>百度音乐榜单</title>
+		<link rel="stylesheet" href="./index.css" />
+	</head>
+
+	<body>
+		<section id="wrap">
+			<h2 class="title">百度音乐榜单</h2>
+			<ul id="list">
+				<li>
+					<input type="checkbox" />
+					<span>第一条信息</span>
+					<a href="javascript:;" class="collect">收藏</a>
+					<a href="javascript:;" class="cancelCollect">取消收藏</a>
+					<a href="javascript:;" class="remove">删除</a>
+				</li>
+			</ul>
+			<footer class="footer">
+				<label><input type="checkbox" id="checkAll" />全选/全不选</label>
+				<a href="javascript:;" id="remove">删除</a>
+				<input type="text" id="newInfo" />
+				<a href="javascript:;" id="add">添加</a>
+			</footer>
+		</section>
+		<script>
+			// {
+			let data = [
+				{
+					id: 1,
+					title: '残酷月光 - 费启鸣',
+					checked: false,
+					collect: true,
+				},
+				{
+					id: 2,
+					title: '兄弟 - 艾热',
+					checked: true,
+					collect: false,
+				},
+				{
+					id: 3,
+					title: '毕生 - 夏增祥',
+					checked: true,
+					collect: true,
+				},
+				{
+					id: 4,
+					title: '公子向北去 - 李春花',
+					checked: false,
+					collect: false,
+				},
+				{
+					id: 5,
+					title: '战场 - 沙漠五子',
+					checked: true,
+					collect: false, //是否收藏 true 收藏 false 没有收藏
+				},
+			];
+
+			// 数据驱动；数据优先；
+			let ul = document.querySelector('#list');
+			function render(data) {
+				ul.innerHTML = '';
+				data.forEach((item) => {
+					let li = document.createElement('li');
+					li.innerHTML = `          
+					<input type="checkbox" ${item.checked ? 'checked' : ''} />
+			       <span>${item.title}</span>
+			       ${
+								item.collect
+									? "<a href='javascript:;' class='cancelCollect'>取消收藏</a>"
+									: "<a href='javascript:;' class='collect'>收藏</a>"
+							}
+					<a href="javascript:;" class="remove">删除</a>
+			     `;
+					ul.appendChild(li);
+				});
+
+				if (data.every((item) => item.checked)) {
+					document.querySelector('#checkAll').checked = true;
+				} else {
+					document.querySelector('#checkAll').checked = false;
+				}
+
+				//事件注册
+				addEvent();
+			}
+			render(data);
+
+			function addEvent() {
+				let lis = ul.querySelectorAll('li');
+				lis.forEach((el, index) => {
+					//取消收藏
+					let collect = el.querySelector('.collect');
+					collect &&
+						(collect.onclick = function () {
+							data[index].collect = true;
+							render(data);
+						});
+
+					//收藏
+					let cancelCollect = el.querySelector('.cancelCollect');
+					cancelCollect &&
+						(cancelCollect.onclick = function () {
+							data[index].collect = false;
+							render(data);
+						});
+
+					//删除一个
+					el.querySelector('.remove').onclick = function () {
+						data.splice(index, 1);
+						render(data);
+					};
+
+					//选中一个
+					el.querySelector('input').onclick = function () {
+						data[index].checked = this.checked;
+						render(data);
+					};
+				});
+			}
+
+			//全选或全部取消
+			document.querySelector('#checkAll').onclick = function () {
+				if (this.checked) {
+					data.forEach((item) => (item.checked = true));
+				} else {
+					data.forEach((item) => (item.checked = false));
+				}
+				render(data);
+			};
+
+			//删除多个
+			document.querySelector('#remove').onclick = function () {
+				let arr = data.filter((item) => !item.checked);
+				render(arr);
+			};
+
+			//添加
+			document.querySelector('#add').onclick = function () {
+				let info = document.querySelector('#newInfo').value.trim();
+				if (info.length === 0) {
+					alert('歌曲名不能为空！');
+					return;
+				}
+				data.push({
+					id: data.length,
+					title: info,
+					checked: false,
+					collect: false,
+				});
+				document.querySelector('#newInfo').value = '';
+				render(data);
+			};
+		</script>
+	</body>
+</html>
